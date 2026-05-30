@@ -39,7 +39,21 @@ def add_todos():
 
 @app.route('/tasks', methods=['GET'])
 def get_todos():
-    tasks = [todo.to_dict() for todo in todos]
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id, item, completed FROM todo")
+    rows = cursor.fetchall()
+    conn.close()
+
+    tasks = []
+    for row in rows:
+        tasks.append({
+            "id": row['id'],
+            "item": row['item'],
+            "completed": bool(row['completed'])
+        })
+    # tasks = [todo.to_dict() for todo in todos]
     return jsonify(tasks), 200
 
 
