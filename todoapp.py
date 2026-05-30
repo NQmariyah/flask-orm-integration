@@ -28,7 +28,7 @@ def get_todo_by_id(task_id):
 
     if task is None:
         abort(404, f"Todo ID: {task_id} Not Found")
-    
+
     return jsonify(task.to_dict()), 200
 
 

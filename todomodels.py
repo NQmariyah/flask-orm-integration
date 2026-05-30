@@ -1,5 +1,4 @@
 import os
-import sqlite3
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
@@ -11,6 +10,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DATABASE_NAME}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
 
 # berikut adalah definisi model yang digunakan dalam ORM
 class Todo(db.Model):
