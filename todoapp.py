@@ -36,5 +36,20 @@ def add_todos():
     return jsonify(new_todo.to_dict()), 201
 
 
+@app.route('/tasks', methods=['GET'])
+def get_todos():
+    tasks = [todo.to_dict() for todo in todos]
+    return jsonify(tasks), 200
+
+
+@app.route('/tasks/<int:task_id>', methods=['GET'])
+def get_todo_by_id(task_id):
+    for todo in todos:
+        if todo.id == task_id:
+            return jsonify(todo.to_dict()), 200
+
+    return jsonify({"error": f"Todo ID: {task_id} Not Found"}), 404
+
+
 if __name__ == '__main__':
     app.run(debug=True)
