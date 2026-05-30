@@ -7,11 +7,11 @@ class Todo:
 	next_id = 1
 
 	def __init__(self, item):
-		self.id = next_id
+		self.id = Todo.next_id
 		self.item = item
 		self.completed = False
 
-		next_id += 1
+		Todo.next_id += 1
 
 	def to_dict(self):
 		return {
