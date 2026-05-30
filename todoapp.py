@@ -1,6 +1,7 @@
-from flask import Flask, request, jsonify, abort
+from flask import request, jsonify, abort
+from todomodels import app
 
-app = Flask(__name__)
+#app = Flask(__name__)
 
 
 class Todo:
