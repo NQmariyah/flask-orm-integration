@@ -1,18 +1,12 @@
 from flask import request, jsonify, abort
-from todomodels import app
-
-#app = Flask(__name__)
+from todomodels import app, get_db_connection
 
 
 class Todo:
-    next_id = 1
-
-    def __init__(self, item):
-        self.id = Todo.next_id
+    def __init__(self, id, item, completed=False):
+        self.id = id
         self.item = item
-        self.completed = False
-
-        Todo.next_id += 1
+        self.completed = completed
 
     def to_dict(self):
         return {
@@ -22,17 +16,23 @@ class Todo:
         }
 
 
-todos = []
-
-
 @app.route('/tasks', methods=['POST'])
 def add_todos():
     if not request.json or 'item' not in request.json:
         abort(400, "Bad Request")
 
     item = request.json['item']
-    new_todo = Todo(item)
-    todos.append(new_todo)
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("INSERT INTO todo (item, completed) VALUES (?,0)", (item,))
+    conn.commit()
+
+    new_id = cursor.lastrowid
+    conn.close()
+
+    new_todo = Todo(new_id, item)
 
     return jsonify(new_todo.to_dict()), 201
 
