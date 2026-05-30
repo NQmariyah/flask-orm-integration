@@ -22,7 +22,7 @@ def add_todos():
         abort(400, "Bad Request")
 
     item = request.json['item']
-    
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -48,8 +48,9 @@ def get_todos():
 
     tasks = []
     for row in rows:
-        tasks.append(Todo(row['id'], row['item'], bool(row['completed'])).to_dict())
-    # tasks = [todo.to_dict() for todo in todos]
+        tasks.append(Todo(row['id'], row['item'], bool(row['completed']))
+                     .to_dict())
+
     return jsonify(tasks), 200
 
 
@@ -58,7 +59,8 @@ def get_todo_by_id(task_id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT id, item, completed FROM todo WHERE id = ?", (task_id,))
+    cursor.execute("SELECT id, item, completed FROM todo WHERE id = ?",
+                   (task_id,))
     row = cursor.fetchone()
     conn.close()
 
@@ -68,12 +70,6 @@ def get_todo_by_id(task_id):
     task = Todo(row['id'], row['item'], bool(row['completed']))
 
     return jsonify(task.to_dict()), 200
-
-    # for todo in todos:
-    #     if todo.id == task_id:
-    #         return jsonify(todo.to_dict()), 200
-
-    # return jsonify({"error": f"Todo ID: {task_id} Not Found"}), 404
 
 
 @app.route('/tasks/<int:task_id>', methods=['PUT'])
@@ -89,7 +85,8 @@ def update_todo(task_id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("UPDATE todo SET item = ?, completed = ? WHERE id = ?", (item, completed, task_id))
+    cursor.execute("UPDATE todo SET item = ?, completed = ? WHERE id = ?",
+                   (item, completed, task_id))
     conn.commit()
 
     if cursor.rowcount == 0:
@@ -101,15 +98,6 @@ def update_todo(task_id):
     task = Todo(task_id, item, completed)
 
     return jsonify(task.to_dict()), 200
-
-
-    # for todo in todos:
-    #     if todo.id == task_id:
-    #         todo.item = request.json['item']
-    #         todo.completed = request.json['completed']
-    #         return jsonify(todo.to_dict()), 201
-
-    # return jsonify({"error": f"Todo ID: {task_id} Not Found"}), 404
 
 
 @app.route('/tasks/<int:task_id>', methods=['DELETE'])
@@ -127,10 +115,6 @@ def delete_todo(task_id):
     conn.close()
 
     return '', 204
-    # for todo in todos:
-    #     if todo.id == task_id:
-    #         todos.remove(todo)
-    #         return '', 204
 
 
 if __name__ == '__main__':
