@@ -48,22 +48,32 @@ def get_todos():
 
     tasks = []
     for row in rows:
-        tasks.append({
-            "id": row['id'],
-            "item": row['item'],
-            "completed": bool(row['completed'])
-        })
+        tasks.append(Todo(row['id'], row['item'], bool(row['completed'])).to_dict())
     # tasks = [todo.to_dict() for todo in todos]
     return jsonify(tasks), 200
 
 
 @app.route('/tasks/<int:task_id>', methods=['GET'])
 def get_todo_by_id(task_id):
-    for todo in todos:
-        if todo.id == task_id:
-            return jsonify(todo.to_dict()), 200
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-    return jsonify({"error": f"Todo ID: {task_id} Not Found"}), 404
+    cursor.execute("SELECT id, item, completed FROM todo WHERE id = ?", (task_id,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if row is None:
+        abort(404, f"Todo ID: {task_id} Not Found")
+
+    task = Todo(row['id'], row['item'], bool(row['completed']))
+
+    return jsonify(task.to_dict()), 200
+
+    # for todo in todos:
+    #     if todo.id == task_id:
+    #         return jsonify(todo.to_dict()), 200
+
+    # return jsonify({"error": f"Todo ID: {task_id} Not Found"}), 404
 
 
 @app.route('/tasks/<int:task_id>', methods=['PUT'])
