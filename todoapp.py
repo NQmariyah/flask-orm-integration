@@ -59,7 +59,7 @@ def delete_todo(task_id):
     if task is None:
         abort(404, f"Todo ID: {task_id} Not Found")
 
-    db.session.delete(todo)
+    db.session.delete(task)
     db.session.commit()
 
     return '', 204
