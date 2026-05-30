@@ -1,6 +1,7 @@
 import os
 import sqlite3
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
@@ -23,8 +24,6 @@ class Todo(db.Model):
             "item": self.item,
             "completed": bool(self.completed)
         }
-
-
 
 
 with app.app_context():

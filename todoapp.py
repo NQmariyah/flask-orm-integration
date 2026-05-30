@@ -1,5 +1,5 @@
 from flask import request, jsonify, abort
-from todomodels import app, get_db_connection, Todo, db
+from todomodels import app, Todo, db
 
 
 @app.route('/tasks', methods=['POST'])
@@ -9,16 +9,9 @@ def add_todos():
 
     item = request.json['item']
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("INSERT INTO todo (item, completed) VALUES (?,0)", (item,))
-    conn.commit()
-
-    new_id = cursor.lastrowid
-    conn.close()
-
-    new_todo = Todo(new_id, item)
+    new_todo = Todo(item=item)
+    db.session.add(new_todo)
+    db.session.commit()
 
     return jsonify(new_todo.to_dict()), 201
 
