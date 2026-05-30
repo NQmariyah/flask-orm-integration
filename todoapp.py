@@ -24,19 +24,11 @@ def get_todos():
 
 @app.route('/tasks/<int:task_id>', methods=['GET'])
 def get_todo_by_id(task_id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    task = Todo.query.get(task_id)
 
-    cursor.execute("SELECT id, item, completed FROM todo WHERE id = ?",
-                   (task_id,))
-    row = cursor.fetchone()
-    conn.close()
-
-    if row is None:
+    if task is None:
         abort(404, f"Todo ID: {task_id} Not Found")
-
-    task = Todo(row['id'], row['item'], bool(row['completed']))
-
+    
     return jsonify(task.to_dict()), 200
 
 
