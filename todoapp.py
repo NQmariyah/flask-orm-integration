@@ -67,5 +67,13 @@ def update_todo(task_id):
     return jsonify({"error": f"Todo ID: {task_id} Not Found"}), 404
 
 
+@app.route('/tasks/<int:task_id>', methods=['DELETE'])
+def delete_todo(task_id):
+    for todo in todos:
+        if todo.id == task_id:
+            todos.remove(todo)
+            return '', 204
+
+
 if __name__ == '__main__':
     app.run(debug=True)
