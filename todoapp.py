@@ -39,23 +39,15 @@ def update_todo(task_id):
             or 'completed' not in request.json):
         abort(400, "Bad Request")
 
-    item = request.json['item']
-    completed = request.json['completed']
+    task = Todo.query.get(task_id)
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("UPDATE todo SET item = ?, completed = ? WHERE id = ?",
-                   (item, completed, task_id))
-    conn.commit()
-
-    if cursor.rowcount == 0:
-        conn.close()
+    if task is None:
         abort(404, f"Todo ID: {task_id} Not Found")
 
-    conn.close()
+    task.item = request.json['item']
+    task.completed = request.json['completed']
 
-    task = Todo(task_id, item, completed)
+    db.session.commit()
 
     return jsonify(task.to_dict()), 200
 
