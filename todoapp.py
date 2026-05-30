@@ -20,6 +20,19 @@ class Todo:
 		    "completed": self.completed
 		}
 
+todos = []
+
+@app.route('/tasks', methods=['POST'])
+def add_todos():
+	if not request.json or not 'item' in request.json:
+		abort(400, "Bad Request")
+
+	item = request.json['item']
+	new_todo = Todo(item)
+	todos.append(new_todo)
+
+	return jsonify(new_todo.to_dict()), 201
+
 
 if __name__ == '__main__':
 	app.run(debug=True)
