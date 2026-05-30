@@ -114,10 +114,23 @@ def update_todo(task_id):
 
 @app.route('/tasks/<int:task_id>', methods=['DELETE'])
 def delete_todo(task_id):
-    for todo in todos:
-        if todo.id == task_id:
-            todos.remove(todo)
-            return '', 204
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM todo WHERE id = ?", (task_id,))
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        conn.close()
+        abort(404, f"Todo ID:{task_id} Not Found")
+
+    conn.close()
+
+    return '', 204
+    # for todo in todos:
+    #     if todo.id == task_id:
+    #         todos.remove(todo)
+    #         return '', 204
 
 
 if __name__ == '__main__':
