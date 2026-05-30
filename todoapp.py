@@ -83,13 +83,33 @@ def update_todo(task_id):
             or 'completed' not in request.json):
         abort(400, "Bad Request")
 
-    for todo in todos:
-        if todo.id == task_id:
-            todo.item = request.json['item']
-            todo.completed = request.json['completed']
-            return jsonify(todo.to_dict()), 201
+    item = request.json['item']
+    completed = request.json['completed']
 
-    return jsonify({"error": f"Todo ID: {task_id} Not Found"}), 404
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE todo SET item = ?, completed = ? WHERE id = ?", (item, completed, task_id))
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        conn.close()
+        abort(404, f"Todo ID: {task_id} Not Found")
+
+    conn.close()
+
+    task = Todo(task_id, item, completed)
+
+    return jsonify(task.to_dict()), 200
+
+
+    # for todo in todos:
+    #     if todo.id == task_id:
+    #         todo.item = request.json['item']
+    #         todo.completed = request.json['completed']
+    #         return jsonify(todo.to_dict()), 201
+
+    # return jsonify({"error": f"Todo ID: {task_id} Not Found"}), 404
 
 
 @app.route('/tasks/<int:task_id>', methods=['DELETE'])
