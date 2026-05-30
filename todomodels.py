@@ -6,32 +6,26 @@ app = Flask(__name__)
 
 DATABASE_NAME = 'todoapp.db'
 DATABASE_PATH = os.path.join(app.instance_path, DATABASE_NAME)
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DATABASE_NAME}"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# berikut adalah fungsi-fungsi yang digunakan
-# untuk akses DATABASE menggunakan NATIVE
+db = SQLAlchemy(app)
+
+# berikut adalah definisi model yang digunakan dalam ORM
+class Todo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    item = db.Column(db.String(100), nullable=False)
+    completed = db.Column(db.Boolean, default=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "item": self.item,
+            "completed": bool(self.completed)
+        }
 
 
-def get_db_connection():
-    conn = sqlite3.connect(DATABASE_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
-def init_db():
-    os.makedirs(app.instance_path, exist_ok=True)
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS todo (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            item TEXT NOT NULL,
-            completed INTEGER NOT NULL DEFAULT 0
-        )
-    ''')
-    conn.commit()
-    conn.close()
 
 
 with app.app_context():
-    init_db()
+    db.create_all()

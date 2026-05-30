@@ -1,19 +1,5 @@
 from flask import request, jsonify, abort
-from todomodels import app, get_db_connection
-
-
-class Todo:
-    def __init__(self, id, item, completed=False):
-        self.id = id
-        self.item = item
-        self.completed = completed
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "item": self.item,
-            "completed": self.completed
-        }
+from todomodels import app, get_db_connection, Todo, db
 
 
 @app.route('/tasks', methods=['POST'])
