@@ -1,16 +1,23 @@
 from flask import request, jsonify, abort
 from todomodels import app, Todo, db, User
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import (
+    JWTManager, create_access_token, jwt_required, get_jwt_identity
+)
 from werkzeug.security import generate_password_hash, check_password_hash
 
 jwt = JWTManager(app)
+
 
 @app.route('/register', methods=['POST'])
 def register():
     data = request.json
 
     if not data or not data.get('username') or not data.get('password'):
-        return jsonify({"error": "Field username dan password tidak ditemukan."}), 400
+        return jsonify(
+                {
+                  "error": "Field username dan password tidak ditemukan."
+                }
+        ), 400
 
     if User.query.filter_by(username=data['username']).first():
         return jsonify({"error": "Username sudah digunakan."}), 409
@@ -23,19 +30,23 @@ def register():
 
     return jsonify({"message": "User berhasil didaftarkan."}), 201
 
+
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
     if not data or not data.get('username') or not data.get('password'):
-        return jsonify({"error": "Username dan password tidak ditemukan."}), 400
+        return jsonify({
+                         "error": "Username dan password tidak ditemukan."
+                      }), 400
 
     user = User.query.filter_by(username=data['username']).first()
-    
+
     if user and check_password_hash(user.password, data['password']):
         access_token = create_access_token(identity=str(user.id))
         return jsonify({"access_token": access_token}), 200
 
     return jsonify({"error": "Username atau password salah."}), 401
+
 
 @app.route('/tasks', methods=['POST'])
 @jwt_required()
