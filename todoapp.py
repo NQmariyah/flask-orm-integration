@@ -64,8 +64,11 @@ def get_todos():
 
 
 @app.route('/tasks/<int:task_id>', methods=['GET'])
+@jwt_required()
 def get_todo_by_id(task_id):
-    task = Todo.query.get(task_id)
+    current_user = get_jwt_identity()
+
+    task = Todo.query.filter_by(id=task_id, user_id=current_user).first()
 
     if task is None:
         abort(404, f"Todo ID: {task_id} Not Found")
@@ -74,13 +77,16 @@ def get_todo_by_id(task_id):
 
 
 @app.route('/tasks/<int:task_id>', methods=['PUT'])
+@jwt_required()
 def update_todo(task_id):
+    current_user = get_jwt_identity()
+
     if (not request.json
             or 'item' not in request.json
             or 'completed' not in request.json):
         abort(400, "Bad Request")
 
-    task = Todo.query.get(task_id)
+    task = Todo.query.filter_by(id=task_id, user_id=current_user).first()
 
     if task is None:
         abort(404, f"Todo ID: {task_id} Not Found")
@@ -94,8 +100,11 @@ def update_todo(task_id):
 
 
 @app.route('/tasks/<int:task_id>', methods=['DELETE'])
+@jwt_required()
 def delete_todo(task_id):
-    task = Todo.query.get(task_id)
+    current_user = get_jwt_identity()
+
+    task = Todo.query.filter_by(id=task_id, user_id=current_user).first()
 
     if task is None:
         abort(404, f"Todo ID: {task_id} Not Found")
