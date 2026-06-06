@@ -1,7 +1,7 @@
 import os
+import datetime
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 
@@ -13,7 +13,6 @@ app.config['JWT_SECRET_KEY'] = "iet solid solid sulit"
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(hours=1)
 
 db = SQLAlchemy(app)
-jwt = JWTManager(app)
 
 
 # berikut adalah definisi model yang digunakan dalam ORM
@@ -30,7 +29,7 @@ class Todo(db.Model):
         return {
             "id": self.id,
             "item": self.item,
-            "completed": bool(self.completed)
+            "completed": bool(self.completed),
             "user": self.user_id
         }
 
