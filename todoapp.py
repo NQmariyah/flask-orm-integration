@@ -38,13 +38,16 @@ def login():
     return jsonify({"error": "Username atau password salah."}), 401
 
 @app.route('/tasks', methods=['POST'])
+@jwt_required()
 def add_todos():
+    current_user = get_jwt_identity()
+
     if not request.json or 'item' not in request.json:
         abort(400, "Bad Request")
 
     item = request.json['item']
 
-    new_todo = Todo(item=item)
+    new_todo = Todo(item=item, user_id=current_user)
     db.session.add(new_todo)
     db.session.commit()
 
@@ -52,8 +55,11 @@ def add_todos():
 
 
 @app.route('/tasks', methods=['GET'])
+@jwt_required()
 def get_todos():
-    tasks = Todo.query.all()
+    current_user = get_jwt_identity()
+
+    tasks = Todo.query.filter_by(user_id=current_user)
     return jsonify([task.to_dict() for task in tasks]), 200
 
 
