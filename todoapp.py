@@ -4,6 +4,24 @@ from flask-jwt-extended import create_access_token, jwt_required, get_jwt_identi
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
+@app.route('/register', methods=['POST'])
+def register():
+    data = register.json
+
+    if not data or not data.get('username') or not data.get('password'):
+        return jsonify({"error"}: "Field username dan password tidak ditemukan."), 400
+
+    if User.query.filter_by(username=data['username']).first():
+        return jsonify({"error"}: "Username sudah digunakan."), 409
+
+    hashed_password = generate_password_hash(data['password'])
+    new_user = User(username=data['username'], password=hashed_password)
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({"message": "User berhasil didaftarkan."}), 201
+
 @app.route('/tasks', methods=['POST'])
 def add_todos():
     if not request.json or 'item' not in request.json:
